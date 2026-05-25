@@ -1,0 +1,32 @@
+function checkBirthdaysAndNotify() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  
+  // Get today's date formatted as MM-DD
+  var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MM-DD");
+  
+  // Loop through the rows (skipping the first header row)
+  for (var i = 1; i < data.length; i++) {
+    var name = data[i][0];
+    var birthday = data[i][1];
+    var phone = data[i][2];
+    
+    if (birthday == today) {
+      // Create the custom text and encode it safely for a URL link
+      var rawMessage = "Happy Birthday, " + name + "! 🎉 Hope you have an amazing day!";
+      var encodedMessage = encodeURIComponent(rawMessage);
+      
+      // Construct the official WhatsApp click-to-chat link
+      var whatsappLink = "https://wa.me/" + phone + "?text=" + encodedMessage;
+      
+      // Build the notification email content
+      var emailSubject = "🎈 Birthday Alert: " + name;
+      var emailBody = "Today is " + name + "'s birthday!\n\n" +
+                      "Click the link below to open WhatsApp and send your pre-written text instantly:\n\n" + 
+                      whatsappLink;
+      
+      // Sends the email to YOUR Google account email address
+      MailApp.sendEmail(Session.getActiveUser().getEmail(), emailSubject, emailBody);
+    }
+  }
+}
